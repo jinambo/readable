@@ -1,18 +1,19 @@
 
 import Navigation from "components/navigation";
 import Footer from "components/footer";
-import Home from "pages/home";
 
-function App() {
+import React from 'react';
+
+const Layout = ({ children }) => {
   return (
     <div className="main">
       <Navigation />
       {/* <div className="top-effect"></div> */}
-      <Home />
-      {/* <Auth /> */}
+      { children }
       {/* <Footer /> */}
     </div>
   );
-};
+}
 
-export default App;
+export default Layout;
+

@@ -16,6 +16,29 @@ p {
     padding: 0.25rem 0;
 }
 
+select {
+    padding: 0.25rem;
+    border: 1px solid rgba($dark, 0.4);
+    border-radius: 4px;
+    color: $dark;
+}
+
+.radio {
+    padding-top: 0.33rem;
+    padding-bottom: 0.33rem;
+
+    label {
+        padding-left: 0.25rem;
+    }
+}
+
+.separator {
+    width: 100%;
+    height: 1px;
+    //border: none;
+    background-color: rgba($dark, 0.25);
+}
+
 // FG colors
 .fg-primary {
     color: $primary;
@@ -36,6 +59,10 @@ p {
 // BG colors
 .bg-light {
     background-color: $light;
+}
+
+.bg-lighter {
+    background-color: $lighter;
 }
 
 .bg-dark {

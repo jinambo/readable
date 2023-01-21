@@ -3,6 +3,11 @@ const operator = {
     OR: "or"
 }
 
+const orderParams = {
+    ASC: "asc",
+    DESC: "desc"
+};
+
 const bookParams = {
     NAME: "name",
     YEAR: "releaseDate",
@@ -18,6 +23,7 @@ const userParams = {
 
 module.exports = {
     operator,
+    orderParams,
     bookParams,
     userParams
 };

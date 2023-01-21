@@ -1,8 +1,9 @@
 import styleModule from './input.module.scss';
 
-const Input = ({ styles, placeholder, type, onChangeAction }) => {
+const Input = ({ styles, placeholder, type, name, onChangeAction }) => {
   return (
     <input
+      name={ name }
       type={ type }
       placeholder={ placeholder }
       className={ styleModule['input'] }

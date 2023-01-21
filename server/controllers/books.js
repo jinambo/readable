@@ -3,7 +3,7 @@ const Book = require('../models/book');
 const Author = require('../models/author');
 const User = require('../models/user');
 const { tokenValidate } = require('../helpers/tokenValidate');
-const { operator, bookParams } = require('../helpers/searchOperators');
+const { operator, bookParams, orderParams } = require('../helpers/searchOperators');
 
 const getBooks = async (req, res) => {
     try {
@@ -30,8 +30,8 @@ const searchBooks = async (req, res) => {
     // If sort is not specified or param does not exist, set it to NAME by default
     if (!Object.values(bookParams).includes(sortParam) || sortParam === undefined) sortParam = bookParams.NAME;
 
-    // If ascending parameter is not specified or is different than 1 or -1
-    if (orderParam === undefined || (orderParam !== "1" && orderParam !== "-1")) orderParam = 1;
+    // If ascending parameter is not specified or is different than ASC or DESC
+    if (orderParam === undefined || (orderParam !== orderParams.ASC && orderParam !== orderParams.DESC)) orderParam = orderParams.ASC;
 
     // console.log('Sort param is: ' + sortParam);
     // console.log('Order param is: ' + orderParam);
@@ -58,7 +58,10 @@ const searchBooks = async (req, res) => {
             // If selected operator is OR
             if (operatorParam === operator.OR) {
                 books = await Book.find({ $or: queries })
-                    .populate('author').sort({ [sortParam]: orderParam });
+                    .populate('author')
+                    .sort({ 
+                        [sortParam]:orderParam === orderParams.ASC ? orderParams.ASC : orderParams.DESC
+                    });
             } 
 
             // If selected operator is OR
@@ -67,7 +70,10 @@ const searchBooks = async (req, res) => {
                     .populate('author').sort({ [sortParam]: orderParam });
             } 
         } else {
-            books = await Book.find().populate('author').sort({ [sortParam]: orderParam });   
+            books = await Book.find().populate('author')
+                .sort({ 
+                    [sortParam]:orderParam === orderParams.ASC ? orderParams.ASC : orderParams.DESC
+                });
         }
 
         res.status(200).json(books);
