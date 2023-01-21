@@ -1,0 +1,89 @@
+// -------------------------------
+// SPACING (margins, paddings)
+// -------------------------------
+
+@mixin Spacing($type, $sideType, $unit, $breakpoint) {
+    $typeMark: str-slice(#{$type}, 1, 1); // get first letter of type 
+    $breakMark: "";
+
+    // If breakpoint exists
+    @if ($breakpoint != "") {
+        $breakMark: -#{$breakpoint};
+    }
+
+    @if ($sideType == "single") {
+        $sides: "top", "bottom", "right", "left";
+
+        @each $side in $sides {
+            $sideMark: str-slice(#{$side}, 1, 1); // get first letter of side 
+        
+            @for $i from 0 through $spacingLevels {
+                .#{$typeMark}-#{$sideMark}-#{$i}#{$breakMark} {
+                    #{$type}-#{$side}: #{$i}#{$unit};
+                }
+            }
+        }
+    } @else if ($sideType == "double") {
+        $sides: "x", "y";
+
+        @each $side in $sides {
+            @if ($side == "x") {
+                @for $i from 0 through $spacingLevels {
+                    .#{$typeMark}-x-#{$i}#{$breakMark} {
+                        #{$type}-left: #{$i}#{$unit};
+                        #{$type}-right: #{$i}#{$unit};
+                    }
+                }
+            } @else {
+                @for $i from 0 through $spacingLevels {
+                    .#{$typeMark}-y-#{$i}#{$breakMark} {
+                        #{$type}-top: #{$i}#{$unit};
+                        #{$type}-bottom: #{$i}#{$unit};
+                    }
+                }
+            } 
+        }
+    } @else {
+        @for $i from 0 through $spacingLevels {
+            .#{$typeMark}-#{$i}#{$breakMark} {
+                #{$type}: #{$i}#{$unit};
+            }
+        }   
+    }
+}
+
+@mixin SpacingWrap($breakpoint) {
+    // 3.1 Single Side Margin
+    @include Spacing("margin", "single", "rem", $breakpoint);
+
+    // 3.2 Double Side Margin
+    @include Spacing("margin", "double", "rem", $breakpoint);
+
+    // 3.3 All Sides Margin
+    @include Spacing("margin", "all", "rem", $breakpoint);
+
+    // 3.4 Single Side Padding
+    @include Spacing("padding", "single", "rem", $breakpoint);
+
+    // 3.5 Double Side Padding
+    @include Spacing("padding", "double", "rem", $breakpoint);
+
+    // 3.6 All Sides Padding
+    @include Spacing("padding", "all", "rem", $breakpoint);
+}
+
+@mixin SpacingAll($lg, $md, $sm) {
+    @include SpacingWrap(""); 
+
+    @media (min-width: $sm) {
+        @include SpacingWrap("sm"); 
+    }
+    
+    @media (min-width: $md) {
+        @include SpacingWrap("md");
+    }
+
+    @media (min-width: $lg) {
+        @include SpacingWrap("lg");
+    }
+}

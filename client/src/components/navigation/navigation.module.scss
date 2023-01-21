@@ -1,0 +1,51 @@
+@import '../../styles/variables.scss';
+
+.navigation {
+    position: relative;
+    z-index: 9;
+    width: 100%;
+    padding: 1rem;
+    color: $dark;
+    background: rgba(245, 245, 242, 0.7);
+    box-shadow: 0 0 36px rgba(47, 47, 47, 0.075);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    //border: 1px solid rgba(71, 92, 122, 0.15);
+
+    &--scrolled {
+        position: fixed;
+        top: 0;
+        animation: scrollDown 0.33s linear;
+    }
+}
+
+.search {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    &__btn {
+        cursor: pointer;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        width: 1.85rem;
+        height: 1.85rem;
+        background-color: $primary;
+        border: 1px solid $dark;
+        padding: 0.33rem;
+        border-radius: 4px;
+    }
+}
+
+@keyframes scrollDown {
+    0% {
+        transform: translateY(-80px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}

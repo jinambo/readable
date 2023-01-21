@@ -1,0 +1,178 @@
+@import './spacing.scss', './simple-grid.scss', './variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    background-color: $light;
+}
+
+p {
+    padding: 0.25rem 0;
+}
+
+// FG colors
+.fg-primary {
+    color: $primary;
+}
+
+.fg-secondary {
+    color: $secondary;
+}
+
+.fg-light {
+    color: $light;
+}
+
+.fg-dark {
+    color: $dark;
+}
+
+// BG colors
+.bg-light {
+    background-color: $light;
+}
+
+.bg-dark {
+    background-color: $dark;
+}
+
+.bg-white {
+    background-color: #fff;
+}
+
+// Breakpoints
+$screen-sm: 576px;
+$screen-md: 768px;
+$screen-lg: 992px;
+
+// Spacing
+$spacingLevels: 8;
+@include SpacingAll($screen-lg, $screen-md, $screen-sm);
+
+// Grid
+@include Grid();
+
+// Containers
+.container {
+    width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1300px) {
+    .container {
+        width: 1000px;
+    }
+}
+
+@media (max-width: 1080px) {
+    .container {
+        width: calc(100% - 40px);
+    }
+}
+
+
+// Flex
+.flex {
+    display: flex;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.h-center {
+    justify-content: center;
+}
+
+.h-end {
+    justify-content: end;
+}
+
+.h-between {
+    justify-content: space-between;
+}
+
+.v-center {
+    align-items: center;
+}
+
+.v-end {
+    align-items: flex-end;
+}
+
+.flex-col.h-center {
+    align-items: center;
+}
+
+.flex-col.h-end {
+    align-items: end;
+}
+
+.flex-col.v-center {
+    justify-content: center;
+}
+
+.top-effect {
+    position: absolute;
+    top: 0.35rem; left: 0;
+    width: 100%;
+    height: 4rem;
+    background-image: url(https://cdn-icons-png.flaticon.com/512/29/29302.png);
+    background-size: contain;
+    animation: animateBg 10s linear infinite;
+}
+
+// TODO: move to book component module
+.book {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background-color: #fdfdfb;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 12px rgba(47, 47, 47, 0.025);
+    transition: 0.3s all ease-in-out;
+
+    &__img {
+        position: relative;
+        overflow: hidden;
+        height: 320px;
+
+        & > img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+        }
+    }
+
+    &:hover {
+        transform: scale(1.035);
+        box-shadow: 0 0 18px rgba(47, 47, 47, 0.1);
+    }
+}
+
+@keyframes animateBg {
+    0% {
+        background-position: 0% 100%
+    }
+    50% {
+        background-position: 100% 100%
+    }
+    100% {
+        background-position: 0% 100%
+    }
+}

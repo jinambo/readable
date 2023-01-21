@@ -1,0 +1,9 @@
+@import '../../../styles/variables.scss';
+
+.input {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba($dark, 0.4);
+    margin-right: 0.33rem;
+    outline-color: $primary;
+}
