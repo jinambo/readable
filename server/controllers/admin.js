@@ -10,14 +10,14 @@ const { operator, userParams } = require('../helpers/searchOperators');
 // Get all users
 const getUsers = async (req, res) => {
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
 
     try {
         const users = await User.find().populate('rented.book');
 
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -34,7 +34,7 @@ const searchUsers = async (req, res) => {
 
     // Check if user is logged admin
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
 
     // If operator is not specified, set it to AND by default
     if (operatorParam === undefined) operatorParam = operator.AND;
@@ -77,61 +77,65 @@ const searchUsers = async (req, res) => {
 
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
-// Verify user
+// Verify/unverify user
 const verifyUser = async (req, res) => {
     const ID = req.params.id;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
+
+    const { verificationStatus } = req.body;
     
     try {
         // Get user to edit
         const user = await User.findById(ID);
-        user.status.verified = true;
+        user.status.verified = verificationStatus === undefined ? true : verificationStatus;
         
         await user.save();
-        res.status(201).json({ message: 'User has been verified', user });
+        res.status(201).json({ message: 'User has been updated.', user });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-// Ban user
+// Ban/unban user
 const banUser = async (req, res) => {
     const ID = req.params.id;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
     
+    const { banStatus } = req.body;
+
     try {
         // Get user to edit
         const user = await User.findById(ID);
-        user.status.banned = true;
+        user.status.banned = banStatus === undefined ? true : banStatus;
         
         await user.save();
-        res.status(201).json({ message: 'User has been banned', user });
+        res.status(201).json({ message: 'User has been updated.', user });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 const createUser = async (req, res) => {
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
     
     const { username, password, confirmPassword, name, lastname, number, address } = req.body;
     
     try {
         // Check if user already exists
         const user = await User.findOne({ username });
-        if (user) return res.status(400).json({ message: 'User already exists.' });
+        if (user) return res.status(400).json({ error: 'User already exists.' });
 
         // Compare passwords
-        if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords are not same.' });
+        if (password !== confirmPassword) return res.status(400).json({ error: 'Passwords are not same.' });
 
         // Hash the password
         const passwordHash = await bcrypt.hash(password, 12);
@@ -157,17 +161,17 @@ const createUser = async (req, res) => {
 
         res.status(201).json({
             message: 'User has been created by admin.',
-            userRes,
+            user: userRes,
             token
         });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 const editUser = async (req, res) => {
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
 
     // Get user id from params
     const ID = req.params.id;
@@ -188,13 +192,13 @@ const editUser = async (req, res) => {
         await user.save();
         res.status(200).json({ message: 'User has been edited.', user });
     } catch (error) {
-        res.status(400).json({ message: error });   
+        res.status(400).json({ error: error.message });   
     }
 };
 
 const deleteUserBook = async (req, res) => {
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
 
     // Get user and book id from params
     const userID = req.params.user;
@@ -202,14 +206,14 @@ const deleteUserBook = async (req, res) => {
 
     try {
         // Find the book for deletion
-        const user = await User.findById(userID);
-        const bookToDelete = user.rented.filter(item => item.book == bookID);
+        const user = await User.findById(userID).populate('rented.book');
+        const bookToDelete = user.rented.filter(item => item.book._id == bookID);
 
         // Get this book from DB - also catch error if the book does not exist
         const book = await Book.findById(bookToDelete[0].book).populate('author');
 
         // Check if user has this book rented
-        if (bookToDelete.length <= 0) return res.status(404).json({ message: 'User does not have this book rented.' });
+        if (bookToDelete.length <= 0) return res.status(404).json({ error: 'User does not have this book rented.' });
 
         // Add returned book to history
         user.history.push({
@@ -228,15 +232,15 @@ const deleteUserBook = async (req, res) => {
         book.licenceCount++;
         await book.save();
 
-        res.status(200).json({ message: 'Book has been deleted and added to the history.' });   
+        res.status(200).json({ message: 'Book has been deleted and added to the history.', user });   
     } catch (error) {
-        res.status(400).json({ message: "Something went wrong, book propably does not exist.", error });   
+        res.status(400).json({ error: error.message });   
     }
 };
 
 // Create new book
 const createBook = async (req, res) => {
-    const { name, description, author, pagesCount, isVisible, licenceCount } = req.body;
+    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate } = req.body;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
     if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
@@ -246,17 +250,18 @@ const createBook = async (req, res) => {
         description,
         author,
         pagesCount,
-        releaseDate: Date.now(),
+        releaseDate,
         isVisible,
         licenceCount
     });
 
     try {
         const newBook = await book.save();
+        const populatedBook = await Book.findById(newBook._id).populate('author');
 
-        res.status(201).json(newBook);
+        res.status(201).json({ message: 'New book has been created.', book: populatedBook });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -265,9 +270,9 @@ const editBook = async (req, res) => {
     const ID = req.params.id;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
     
-    const { name, description, author, pagesCount, isVisible, licenceCount } = req.body;
+    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate } = req.body;
 
     try {
         // Get book from the DB
@@ -279,14 +284,16 @@ const editBook = async (req, res) => {
         if (licenceCount) book.licenceCount = licenceCount;
         if (author) book.author = author;
         if (pagesCount) book.pagesCount = pagesCount;
+        if (releaseDate) book.releaseDate = releaseDate;
         if (isVisible) book.isVisible = isVisible;
 
         // Save new book's values
-        await book.save();
+        const editedBook = await book.save();
+        const populatedBook = await Book.findById(editedBook._id).populate('author');
 
-        res.status(200).json({ message: 'Book has been edited.', book });
+        res.status(200).json({ message: 'Book has been edited.', book: populatedBook });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -295,7 +302,7 @@ const deleteBook = async (req, res) => {
     const ID = req.params.id;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
-    if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
 
     try {
         // Check if the book is in any user's rented array
@@ -303,14 +310,28 @@ const deleteBook = async (req, res) => {
         const rentedBooks = users.map(user => user.rented).flat();
         const isRented = rentedBooks.some(rentedBook => rentedBook.book._id.equals(ID));
 
-        if (isRented) return res.status(400).json({ message: 'The book is currently rented and cannot be deleted.' });
+        if (isRented) return res.status(400).json({ error: 'The book is currently rented and cannot be deleted.' });
 
         // Delete the book
         await Book.findByIdAndDelete(ID);
 
-        res.status(200).json({ message: 'Book has been deleted.' });
+        res.status(200).json({ message: 'Book has been deleted.', bookId: ID });
     } catch (error) {
-        res.status(400).json({ message: error.message });   
+        res.status(400).json({ error: error.message });   
+    }
+};
+
+// Validate admin
+const validateAdmin = async (req, res) => {
+    let admin = tokenValidate(req, process.env.jwt_key_admin);
+    if (!admin.ok) return res.status(400).json({ error: 'Token is not valid' });
+
+    try {
+        const currentAdmin = await Admin.findOne({ username: admin.data.username })
+
+        res.status(200).json(currentAdmin);
+    } catch(error) {
+        res.status(400).json({ error: error });
     }
 };
 
@@ -321,11 +342,11 @@ const login = async (req, res) => {
     try {
         // Check if user exists
         const admin = await Admin.findOne({ username });
-        if (!admin) return res.status(400).json({ message: 'User does not exist.' });
+        if (!admin) return res.status(400).json({ error: 'User does not exist.' });
 
         // Compare passwords hash
         const match = await bcrypt.compare(password, admin.password);
-        if (!match) return res.status(400).json({ message: 'Inputed password is wrong.' });
+        if (!match) return res.status(400).json({ error: 'Inputed password is wrong.' });
 
         // Sign JWT
         const token = createToken(admin, process.env.jwt_key_admin);
@@ -337,7 +358,7 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({ message: error });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -348,10 +369,10 @@ const register = async (req, res) => {
     try {
         // Check if user already exists
         const admin = await Admin.findOne({ username });
-        if (admin) return res.status(400).json({ message: 'User already exists.' });
+        if (admin) return res.status(400).json({ error: 'User already exists.' });
 
         // Compare passwords
-        if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords are not same.' });
+        if (password !== confirmPassword) return res.status(400).json({ error: 'Passwords are not same.' });
 
         // Hash the password
         const passwordHash = await bcrypt.hash(password, 12);
@@ -376,12 +397,13 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 
 module.exports = {
+    validateAdmin,
     register,
     login,
     createBook,

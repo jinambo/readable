@@ -1,0 +1,14 @@
+.book-detail {
+    position: relative;
+
+    &__thumb {
+        overflow: hidden;
+        border-radius: 1rem;
+        box-shadow: 0 0 12px rgba(47, 47, 47, 0.025);
+    }
+
+    &__info {
+        max-width: 760px;
+        font-size: 1.15rem;
+    }
+}

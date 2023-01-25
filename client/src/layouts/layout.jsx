@@ -1,13 +1,22 @@
 
+import { useState, useEffect } from "react";
 import Navigation from "components/navigation";
 import Footer from "components/footer";
-
-import React from 'react';
+import Cart from "components/cart";
 
 const Layout = ({ children }) => {
+  const [cartOpened, setCartOpened] = useState(false);
+
   return (
     <div className="main">
-      <Navigation />
+      <Navigation
+        setCartOpened={ setCartOpened }
+      />
+      { cartOpened &&
+        <Cart
+          setCartOpened={ setCartOpened }
+        />
+      }
       {/* <div className="top-effect"></div> */}
       { children }
       {/* <Footer /> */}

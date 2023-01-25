@@ -90,39 +90,42 @@ const getBook = async (req, res) => {
 
         res.status(200).json(book);
     } catch (error) {
-        res.status(404).json({ message: "Book not found in the database." });
+        res.status(404).json({ error: "Book not found in the database." });
     }
 };
 
 const rentBooks = async (req, res) => {
     // Check if user has valid token
     let user = tokenValidate(req, process.env.jwt_key);
-    if (!user.ok) return res.status(400).json({ message: 'User is not logged in.' });
+    if (!user.ok) return res.status(400).json({ error: 'User is not logged in.' });
 
     // Destruct values from request body
     const { books } = req.body;
 
     try {
         // Get current user from token
-        const currentUser = await User.findOne({ username: user.data.username });
+        const currentUser = await User.findOne({ username: user.data.username }).populate('rented.book');
 
         // Check if user has verified account
-        if (!currentUser.status.verified) return res.status(400).json({ message: 'User is not verified by admin.' });
+        if (!currentUser.status.verified) return res.status(400).json({ error: 'User is not verified by admin.' });
+
+        // If books are not specified from the client side
+        if(books === undefined || books === null || books?.length <= 0) return res.status(400).json({ error: 'Empty order is not valid.' });
 
         // Check if those books exists and has licences
         const booksFromDB = await Book.find({ _id: { $in: books }, licenceCount: { $gt: 0 } });
-        if (books.length !== booksFromDB.length) return res.status(400).json({ message: 'User cannot non existing books or books without licence.' });
+        if (books.length !== booksFromDB.length) return res.status(400).json({ error: 'User cannot rent non existing books or books without a licence.' });
 
         // Check if user has space to rent those books
-        if ((6 - currentUser.rented.length) < books.length) return res.status(400).json({ message: 'User cannot rent more than 6 books.' });
+        if ((6 - currentUser.rented.length) < books.length) return res.status(400).json({ error: 'User cannot rent more than 6 books.' });
 
         // Check if user already has those books
         const duplicates = currentUser.rented.filter(item => books.includes(item.book.toString()));
-        if (duplicates.length > 0) return res.status(400).json({ message: 'User cannot rent book that is already rented.' });
+        if (duplicates.length > 0) return res.status(400).json({ error: 'User cannot rent book that is already rented.' });
 
         // Push new rented books
         booksFromDB.forEach(book => {
-            currentUser.rented.push({ book: book._id, createdAt: Date.now() });
+            currentUser.rented.push({ book: book, createdAt: Date.now() });
 
             // Decrement licences count
             book.licenceCount--;
@@ -135,7 +138,7 @@ const rentBooks = async (req, res) => {
         await currentUser.save();
         res.status(201).json({ message: 'Books has been rented.', currentUser });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -145,20 +148,20 @@ const returnBook = async (req, res) => {
 
     // Check if user has valid token
     let user = tokenValidate(req, process.env.jwt_key);
-    if (!user.ok) return res.status(400).json({ message: 'User is not logged in.' });
+    if (!user.ok) return res.status(400).json({ error: 'User is not logged in.' });
 
     try {
         // Get current user from token
-        const currentUser = await User.findOne({ username: user.data.username });
+        const currentUser = await User.findOne({ username: user.data.username }).populate('rented.book');
 
         // Check if user has verified account
-        if (!currentUser.status.verified) return res.status(400).json({ message: 'User is not verified by admin.' });
+        if (!currentUser.status.verified) return res.status(400).json({ error: 'User is not verified by admin.' });
 
         // Get requested book from DB
         const book = await Book.findById(id).populate('author');
 
         // Get this book's rent date
-        const bookFromRented = currentUser.rented.filter(item => item.book.toString() === id);
+        const bookFromRented = currentUser.rented.filter(item => item.book._id.toString() === id);
 
         // Add returned book to history
         currentUser.history.push({
@@ -168,7 +171,7 @@ const returnBook = async (req, res) => {
         });
 
         // Return the book found by ID
-        currentUser.rented = currentUser.rented.filter(item => item.book.toString() !== id);
+        currentUser.rented = currentUser.rented.filter(item => item.book._id.toString() !== id);
 
         await currentUser.save();
 
@@ -178,7 +181,7 @@ const returnBook = async (req, res) => {
 
         res.status(201).json({ message: 'Books has been returned and added to the history.', currentUser });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 

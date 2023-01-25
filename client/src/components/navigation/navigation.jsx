@@ -1,25 +1,23 @@
 // React dependencies
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-
+import { UserContext } from 'contexts/UserProvider';
 import Button from 'components/atoms/button';
-import Input from 'components/atoms/input';
 
 // Styles
 import styles from './navigation.module.scss';
 
-const Navigation = () => {
-  const [scrolled, setScrolled] = useState(false);
-  // const [term, setTerm] = useState('');
+const Navigation = ({ setCartOpened, cartContentLength }) => {
+  // Cart and user getter from the context
+  const { user, cart } = useContext(UserContext);
 
-  // const handleSearch = () => {
-  //   console.log('Searching for the book: ' + term);
-  // };
+  const [scrolled, setScrolled] = useState(false);
 
   const handleScroll = () => {
     window.scrollY > 120 ? setScrolled(true) : setScrolled(false);
   };
 
+  // Trigger handleScroll function on the scroll
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
 
@@ -40,31 +38,35 @@ const Navigation = () => {
           </Link>
         </div>
 
-        {/* <div className={`${ styles['search'] } col-6 col-sm col-align-middle`}>
-          <Input
-            type="text"
-            placeholder="Type name of the book .."
-            styles={{ flex: 1 }}
-            onChangeAction={ (e) => setTerm(e.target.value) }
-          />
-          <div
-            className={ styles['search__btn'] }
-            onClick={ handleSearch }
-          >
-            <img src="/public/search.svg" alt="" />
-          </div>
-        </div> */}
-
-        <div className="col-4 col-sm col-align-middle p-l-1 flex h-end">
-          <Button
-            type="secondary"
-            link="/auth/register"
-          >Create an account</Button>
-          <Button
-            type="primary"
-            link="/auth/login"
-            styles={{ marginLeft: '0.5rem' }}
-          >Login to account</Button>
+        <div className="col-4 col-sm col-align-middle p-l-1 flex h-end v-center">
+          { user ?
+            <>
+              <Link to="/account" className="fg-secondary">
+                { user.name }'s account
+              </Link>
+              <div
+                to={`#`}
+                className={`${ styles['cart'] } fg-secondary m-l-1`}
+                onClick={ () => setCartOpened(true) }
+              >
+                <img src='/public/cart.svg'></img>
+                <span className={`${ styles['cart__amount'] }`}>
+                  { cart.length }
+                </span>
+              </div>
+            </> :
+            <>            
+              <Button
+                type="secondary"
+                link="/auth/register"
+              >Create an account</Button>
+              <Button
+                type="primary"
+                link="/auth/login"
+                styles={{ marginLeft: '0.5rem' }}
+              >Login to account</Button>
+            </>
+          }
         </div>
       </div>
       

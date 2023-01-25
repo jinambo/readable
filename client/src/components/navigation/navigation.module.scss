@@ -19,6 +19,29 @@
     }
 }
 
+.cart {
+    cursor: pointer;
+    position: relative;
+    padding: 0.5rem;
+    background-color: $secondary-dark;
+    border-radius: 50%;
+
+    &__amount {
+        position: absolute;
+        bottom: -7px;
+        right: -7px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: $primary;
+        color: $secondary-dark;
+        font-weight: bold;
+    }
+}
+
 .search {
     position: relative;
     display: flex;

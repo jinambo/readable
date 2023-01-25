@@ -1,35 +1,60 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "contexts/UserProvider";
 import useFetch from "hooks/useFetch";
+import usePopMessage from "hooks/usePopMessage";
 import methods from "utils/methods";
 import Input from "components/atoms/input";
 import Button from "components/atoms/button";
+import { Helmet } from "react-helmet";
 
 const Login = () => {
   const [login, setLogin] = useState({});
-  const { data, loading, error, refetchByBody } = useFetch({
-    url: 'http://localhost:4000/users/login',
+  const { data, loading, error, refetchByUrlAndBody } = useFetch({
+    url: null,
     method: methods.POST
   });
+
+  // Navigatin
+  const navigate = useNavigate();
+
+  // User setter from user context
+  const { setUser } = useContext(UserContext);
+
+  // Pop-up (error/success)
+  const [popup, show] = usePopMessage();
 
   // Fetch user data
   const handleLogin = (e) => {
     e.preventDefault();
 
-    refetchByBody({
+    refetchByUrlAndBody('http://localhost:4000/users/login', {
       username: login.username,
       password: login.password
     });
   }
 
-  // Set user's token to storage
+  // Set user's token to the storage and user object to the context's state
   useEffect(() => {
-    if (data?.token) localStorage.setItem('token', data?.token);
+    if (data?.token && data?.user) {
+      localStorage.setItem('token', data?.token);
+      setUser(data?.user);
+
+      // Navigate to homepage
+      navigate('/', { replace: true });
+    } else {
+      show(error, 'error');
+    }
   }, [loading]);
     
   return (
     <>
+      <Helmet>
+        <title>Readable - login to your account</title>
+      </Helmet>
+
       <h2 className="m-b-2">Login to your account</h2>
+      { popup.message && popup.type === 'error' && <p className="pop-error m-b-2">{popup.message}</p> }
 
       <form className="grid v-end">
         <div className="col-12 col-middle">

@@ -7,7 +7,7 @@ const getAuthors = async (req, res) => {
 
         res.status(200).json(authors);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -20,7 +20,7 @@ const getAuthor = async (req, res) => {
 
         res.status(200).json(author);
     } catch (error) {
-        res.status(404).json({ message: "Author not found in the database." });
+        res.status(404).json({ error: "Author not found in the database." });
     }
 };
 
@@ -34,7 +34,7 @@ const postAuthor = async (req, res) => {
 
         res.status(201).json(newAuthor);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 

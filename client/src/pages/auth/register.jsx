@@ -1,26 +1,47 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import useFetch from "hooks/useFetch";
+import usePopMessage from "hooks/usePopMessage";
 import methods from "utils/methods";
 import Input from "components/atoms/input";
 import Button from "components/atoms/button";
 
 const Register = () => {
   const [register, setRegister] = useState({});
+  const { data, loading, error, refetchByBody } = useFetch({
+    url: 'http://localhost:4000/users/register',
+    method: methods.POST
+  });
 
-    // Fetch user data
-    const handleRegister = (e) => {
-      e.preventDefault();
+  // Pop-up (error/success)
+  const [popup, show] = usePopMessage();
 
-      refetchByBody({
-        username: login.username,
-        password: login.password
-      });
+  // Fetch user data
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    refetchByBody(register);
+  }
+
+  // Set user's token to storage
+  useEffect(() => {
+    if (data?.token && data?.user) {
+      localStorage.setItem('token', data?.token);
+      setUser(data?.user);
+    } else {
+      show(error, 'error');
     }
+  }, [loading]);
 
   return (
     <>
+      <Helmet>
+        <title>Readable - create new account</title>
+      </Helmet>
       <h2 className="m-b-2">Create an account</h2>
+
+      { popup.message && popup.type === 'error' && <p className="pop-error m-b-2">{popup.message}</p> }
 
       <form className="grid v-end">
         <div className="col-6 col-middle">

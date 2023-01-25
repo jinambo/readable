@@ -1,15 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { UserContext } from 'contexts/UserProvider';
 import useFetch from 'hooks/useFetch';
-import Search from './search';
+import Search from 'components/molecules/search';
 import styles from './home.module.scss';
+import BookItem from 'components/molecules/book/bookItem';
 
 const Home = () => {
+  const { user } = useContext(UserContext);
+
   const { data, loading, error, refetchByUrl } = useFetch({
     url: 'http://localhost:4000/books'
   });
   
+  // Query for searching
   const [query, setQuery] = useState(null);
+
+  // Inputs for the search component
+  const searchInputs = [
+    {
+      name: "name",
+      type: "text",
+      label: "Book title",
+      placeholder: "Type name of the book ..",
+      cols: 4
+    },
+    {
+      name: "author",
+      type: "text",
+      label: "Book author",
+      placeholder: "Type name of the author ..",
+      cols: 4
+    },
+    {
+      name: "year",
+      type: "text",
+      label: "Release year",
+      placeholder: "Type release year ..",
+      cols: 2
+    }
+  ];
 
   // Fetch search on query change
   useEffect(() => {
@@ -17,30 +48,25 @@ const Home = () => {
   }, [query]);
 
   return (
-    <main className={`${styles['home']} container p-y-4`}>
-        <h1 className="fg-dark p-x-1">All your favorite books on one place</h1>
+    <>
+      <Helmet>
+          <title>Readable - cool online library</title>
+      </Helmet>
 
-        <Search setQuery={ setQuery }/>
+      <main className={`${styles['home']} container p-y-4`}>
+          <h1 className="fg-dark p-x-1">All { user?.name }'s favorite books on one place</h1>
 
-        <div className="grid p-t-2">
-          { !loading && data.map(book => (
-            <Link to={ `/book/${book._id}` } key={ book._id } className="col-3 p-1" style={{ textDecoration: 'none' }}>
-              <div className="book">
-                <div className="book__img">
-                  <img src="https://www.databazeknih.cz/img/books/48_/481910/bmid_babicka-VGR-481910.jpeg" alt="" />
-                </div>
-                <div className="book_info p-1">
-                  <h3 className="fg-dark">{ book.name }</h3>
-                  <div className="flex v-center h-between fg-dark">
-                    <h5>{book?.author?.name}</h5>
-                    <p>{ new Date(book.releaseDate).getFullYear() }</p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          )) }
-        </div>
-    </main>
+          <div className="m-x-1">
+            <Search inputs={ searchInputs } setQuery={ setQuery }/>
+          </div>
+
+          <div className="grid p-t-2">
+            { !loading && data.filter(book => book.isVisible).map(book => (
+              <BookItem key={ book._id } book={ book } />
+            )) }
+          </div>
+      </main>
+    </>
   );
 }
 

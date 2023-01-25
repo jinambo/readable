@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, createBook, editBook, deleteBook, verifyUser, banUser, createUser, editUser, deleteUserBook, getUsers, searchUsers } = require('../controllers/admin');
+const { register, login, createBook, editBook, deleteBook, verifyUser, banUser, createUser, editUser, deleteUserBook, getUsers, searchUsers, validateAdmin } = require('../controllers/admin');
 
 // POST register - just for admin initialization
 // router.post('/register', register);
@@ -37,5 +37,8 @@ router.patch('/edit-user/:id', editUser);
 
 // PATCH return user's rented book (remove from rented)
 router.patch('/user/:user/delete-book/:book', deleteUserBook);
+
+// GET validate admin
+router.get('/validate', validateAdmin);
 
 module.exports = router;

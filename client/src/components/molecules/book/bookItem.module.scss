@@ -1,0 +1,27 @@
+
+.book {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background-color: #fdfdfb;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 12px rgba(47, 47, 47, 0.025);
+    transition: 0.3s all ease-in-out;
+
+    &__img {
+        position: relative;
+        overflow: hidden;
+        height: 320px;
+
+        & > img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+        }
+    }
+
+    &:hover {
+        transform: scale(1.035);
+        box-shadow: 0 0 18px rgba(47, 47, 47, 0.1);
+    }
+}

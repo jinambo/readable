@@ -10,7 +10,7 @@ const orderParams = {
 
 const bookParams = {
     NAME: "name",
-    YEAR: "releaseDate",
+    YEAR: "year",
     AUTHOR: "author"
 };
 

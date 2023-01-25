@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import methods from "utils/methods";
 
-const useFetch = ({ url: initialUrl, method, body: initialBody }) => {
+const useFetch = ({ url: initialUrl, method, body: initialBody, authType = 'user' }) => {
     const [url, setUrl] = useState(initialUrl);
     const [body, setBody] = useState(initialBody);
     const [refetch, setRefetch] = useState(false);
@@ -21,7 +21,7 @@ const useFetch = ({ url: initialUrl, method, body: initialBody }) => {
         setError('');
 
         // Check for token in storage
-        const token = localStorage.getItem('token');
+        const token = authType === 'user' ? localStorage.getItem('token') : localStorage.getItem('adminToken');
         
         // Create headers object
         const headers = {
@@ -30,17 +30,21 @@ const useFetch = ({ url: initialUrl, method, body: initialBody }) => {
         };
 
         // Fetch data from url provided
-        fetch(url, {
-            method, 
-            headers, 
-            ...(body && { body: JSON.stringify(body) })
-        })
+        if (url !== null) {
+            fetch(url, {
+                method, 
+                headers, 
+                ...(body && { body: JSON.stringify(body) })
+            })
             .then((res) => res.json())
             .then((data) => {
                 setError(data.error)
                 setData(data)
                 setLoading(false)
+
+                console.log(data)
             })
+        }
     }, [url, body, refetch]);
 
     // Update url state function 
@@ -55,10 +59,16 @@ const useFetch = ({ url: initialUrl, method, body: initialBody }) => {
         setRefetch(true);
     };
 
+    const refetchByUrlAndBody = (newUrl, newBody) => {
+        setUrl(newUrl)
+        setBody(newBody);
+        setRefetch(true);
+    };
+
     const send = () => setRefetch(true);
 
     // Return data as an object
-    return { data, loading, error, send, refetchByUrl, refetchByBody };
+    return { data, loading, error, send, refetchByUrl, refetchByBody, refetchByUrlAndBody };
 };
 
 export default useFetch;
