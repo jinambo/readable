@@ -119,9 +119,19 @@ const EditBook = ({ book, setBookToEdit, books, setBooks}) => {
           <p className="fg-dark">Licence count</p>
           <Input
             name="licenceCount"
-            type="text"
+            type="number"
             styles={{ flex: 1 }}
             defaultValue={ book?.licenceCount }
+            onChangeAction={ (e) => setBookInput({...bookInput, [e.target.name]: e.target.value}) }
+          />
+        </div>
+        <div className="col-6 col-middle m-t-1">
+          <p className="fg-dark">Book cover</p>
+          <Input
+            name="cover"
+            type="text"
+            styles={{ flex: 1 }}
+            defaultValue={ book?.cover }
             onChangeAction={ (e) => setBookInput({...bookInput, [e.target.name]: e.target.value}) }
           />
         </div>

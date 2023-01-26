@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const { exec } = require('child_process');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Admin = require('../models/admin');
@@ -20,6 +22,59 @@ const getUsers = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Export DB content
+const exportDb = async (req, res) => {
+    let admin = tokenValidate(req, process.env.jwt_key_admin);
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
+    
+    exec(`mongodump --uri="${process.env.connection_string}" --archive=export.archive`, (err, stdout, stderr) => {
+        if (err) return res.status(500).send(err);
+    });
+
+    res.status(200).download('./export.archive', 'export.archive');
+};
+
+// Import DB content
+const importDb = (req, res) => {
+    let admin = tokenValidate(req, process.env.jwt_key_admin);
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
+
+    try {
+        if (!req.headers['content-type'].includes('multipart/form-data')) {
+            return res.status(400).json({message: 'No file sent'});
+        }
+
+        if (req.file) {
+            exec(`mongorestore --uri="${process.env.connection_string}" --archive=${req.file.path}`, (err, stdout, stderr) => {
+                if (err) return res.status(500).json({ err });
+                return res.status(200).json({ message: 'Data imported successfully' });
+            });
+        } else {
+            return res.status(400).json({message: 'No file sent'});
+        }
+
+        //return res.status(200).json({ message: 'Data has been imported.' });    
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+// Export DB collection
+/*
+const exportDb = async (req, res) => {
+    let admin = tokenValidate(req, process.env.jwt_key_admin);
+    if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
+
+    const collection = req.params.collection;
+
+    exec(`mongoexport --uri="mongodb+srv://jinambo:WRA46Ee23Z@cluster0.twwzzy8.mongodb.net/?retryWrites=true&w=majority" --collection=${collection} --out=${collection}.json`, (err, stdout, stderr) => {
+        if (err) return res.status(500).send(err);
+    });
+    
+    res.status(200).download('./users.json', 'users.json');
+};
+*/
 
 // Search in users
 const searchUsers = async (req, res) => {
@@ -240,7 +295,7 @@ const deleteUserBook = async (req, res) => {
 
 // Create new book
 const createBook = async (req, res) => {
-    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate } = req.body;
+    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate, cover } = req.body;
 
     let admin = tokenValidate(req, process.env.jwt_key_admin);
     if (!admin.ok) return res.status(400).json({ message: 'You are not admin or not logged in.' });
@@ -252,7 +307,8 @@ const createBook = async (req, res) => {
         pagesCount,
         releaseDate,
         isVisible,
-        licenceCount
+        licenceCount,
+        cover
     });
 
     try {
@@ -272,7 +328,7 @@ const editBook = async (req, res) => {
     let admin = tokenValidate(req, process.env.jwt_key_admin);
     if (!admin.ok) return res.status(400).json({ error: 'You are not admin or not logged in.' });
     
-    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate } = req.body;
+    const { name, description, author, pagesCount, isVisible, licenceCount, releaseDate, cover } = req.body;
 
     try {
         // Get book from the DB
@@ -286,6 +342,7 @@ const editBook = async (req, res) => {
         if (pagesCount) book.pagesCount = pagesCount;
         if (releaseDate) book.releaseDate = releaseDate;
         if (isVisible) book.isVisible = isVisible;
+        if (cover) book.cover = cover;
 
         // Save new book's values
         const editedBook = await book.save();
@@ -403,6 +460,8 @@ const register = async (req, res) => {
 
 
 module.exports = {
+    exportDb,
+    importDb,
     validateAdmin,
     register,
     login,

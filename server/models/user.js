@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
             createdAt: {
                 type: Date,
                 default: Date.now(),
-                expires: '6d'
+                // expires: '6d'
             }
         }],
         default: []
@@ -67,6 +67,8 @@ const userSchema = new mongoose.Schema({
         }]
     }
 });
+
+// userSchema.index({ "rented.createdAt": 1 }, { expireAfterSeconds: 30 });
 
 
 // userSchema.pre('save', async function (next) {

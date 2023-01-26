@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, createBook, editBook, deleteBook, verifyUser, banUser, createUser, editUser, deleteUserBook, getUsers, searchUsers, validateAdmin } = require('../controllers/admin');
+const { register, login, createBook, editBook, deleteBook, verifyUser, banUser, createUser, editUser, deleteUserBook, getUsers, searchUsers, validateAdmin, exportDb, importDb } = require('../controllers/admin');
+const multer  = require('multer')
+
+// Set multer file storage folder
+const upload = multer({ dest: 'uploads/' })
 
 // POST register - just for admin initialization
 // router.post('/register', register);
@@ -40,5 +44,8 @@ router.patch('/user/:user/delete-book/:book', deleteUserBook);
 
 // GET validate admin
 router.get('/validate', validateAdmin);
+
+router.get('/export', exportDb);
+router.post('/import', upload.single('importFile'), importDb);
 
 module.exports = router;

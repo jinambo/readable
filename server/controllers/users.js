@@ -120,7 +120,7 @@ const register = async (req, res) => {
 
         res.status(201).json({
             message: 'User has been created.',
-            userRes,
+            user: userRes,
             token
         });
 

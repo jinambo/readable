@@ -120,7 +120,7 @@ const rentBooks = async (req, res) => {
         if ((6 - currentUser.rented.length) < books.length) return res.status(400).json({ error: 'User cannot rent more than 6 books.' });
 
         // Check if user already has those books
-        const duplicates = currentUser.rented.filter(item => books.includes(item.book.toString()));
+        const duplicates = currentUser.rented.filter(item => books.includes(item.book._id.toString()));
         if (duplicates.length > 0) return res.status(400).json({ error: 'User cannot rent book that is already rented.' });
 
         // Push new rented books

@@ -28,12 +28,10 @@ const bookSchema = new mongoose.Schema({
     licenceCount: {
         type: String,
         required: true
+    },
+    cover: {
+        type: String,
     }
-    // TODO: add picture
-    /*picture: {
-        data: Buffer,
-        contentType: String,
-    }*/
 });
 
 module.exports = mongoose.model('Book', bookSchema);

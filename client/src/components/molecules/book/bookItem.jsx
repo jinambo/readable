@@ -6,7 +6,7 @@ const BookItem = ({book}) => {
     <Link to={ `/book/${book._id}` } className="col-3 p-1" style={{ textDecoration: 'none' }}>
       <div className={styles['book']}>
         <div className={styles['book__img']}>
-          <img src="https://www.databazeknih.cz/img/books/48_/481910/bmid_babicka-VGR-481910.jpeg" alt="" />
+          <img src={ book.cover ? book.cover : '/public/placeholder.jpeg' } alt={ book.name } />
         </div>
         <div className={`${styles['book__info']} p-1`}>
           <h3 className="fg-dark">{ book.name }</h3>

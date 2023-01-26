@@ -1,14 +1,24 @@
 // Dependencies
+const cloudinary = require('cloudinary');
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
+require('./cron');
 
 // Routes
 const bookRoutes = require('./routes/books');
 const authorRoutes = require('./routes/authors');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+
+// Cloudinary setup
+cloudinary.config({ 
+  cloud_name: process.env.cloud_name, 
+  api_key: process.env.api_key, 
+  api_secret: process.env.api_secret 
+});
 
 // Connect mongoose to MongoDB Cluster
 mongoose.connect(process.env.connection_string, {

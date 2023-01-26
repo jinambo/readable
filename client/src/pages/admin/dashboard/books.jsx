@@ -155,7 +155,7 @@ const Books = () => {
                 </Button>
                 <Button
                   type="secondary"
-                  styles={{ textAlign: 'center', marginLeft: '0.35rem' }}
+                  styles={{ background: '#e1462a', textAlign: 'center', marginLeft: '0.35rem' }}
                   onClickAction={ () => handleDelete(book._id) }
                 >
                   <img src="/public/trashLight.svg" />

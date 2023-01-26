@@ -113,9 +113,18 @@ const CreateBook = ({ books, setBooks, setCreateIsOpenned}) => {
           <p className="fg-dark">Licence count</p>
           <Input
             name="licenceCount"
-            type="text"
+            type="number"
             styles={{ flex: 1 }}
             placeholder="Type amount of licences ..."
+            onChangeAction={ (e) => setBookInput({...bookInput, [e.target.name]: e.target.value}) }
+          />
+        </div>
+        <div className="col-6 col-middle m-t-1">
+          <p className="fg-dark">Book cover</p>
+          <Input
+            name="cover"
+            type="text"
+            styles={{ flex: 1 }}
             onChangeAction={ (e) => setBookInput({...bookInput, [e.target.name]: e.target.value}) }
           />
         </div>

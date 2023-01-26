@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import methods from "utils/methods";
 
-const useFetch = ({ url: initialUrl, method, body: initialBody, authType = 'user' }) => {
+const useFetch = ({ url: initialUrl, method, body: initialBody, authType = 'user', contentType = 'application/json' }) => {
     const [url, setUrl] = useState(initialUrl);
     const [body, setBody] = useState(initialBody);
     const [refetch, setRefetch] = useState(false);
@@ -25,7 +25,7 @@ const useFetch = ({ url: initialUrl, method, body: initialBody, authType = 'user
         
         // Create headers object
         const headers = {
-            'Content-Type': 'application/json',
+            'Content-Type': contentType,
             ...(token && { Authorization: `Bearer ${token}` }),
         };
 
@@ -38,11 +38,11 @@ const useFetch = ({ url: initialUrl, method, body: initialBody, authType = 'user
             })
             .then((res) => res.json())
             .then((data) => {
-                setError(data.error)
-                setData(data)
-                setLoading(false)
+                if (data?.error) setError(data.error);
+                setData(data);
+                setLoading(false);
 
-                console.log(data)
+                // console.log(data)
             })
         }
     }, [url, body, refetch]);

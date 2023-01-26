@@ -47,11 +47,11 @@ const Book = () => {
         { popup.message && popup.type === 'success' && <p className="pop-success m-b-2">{popup.message}</p> }
 
         { (!loading && data) && <>
-          <div className={`${ styles['book-detail'] } flex`}>
-            <div className={`${ styles['book-detail__thumb'] }`}>
-              <img src="https://www.databazeknih.cz/img/books/48_/481910/bmid_babicka-VGR-481910.jpeg" alt={data.name} />
+          <div className={`${ styles['book-detail'] } grid`}>
+            <div className={`${ styles['book-detail__thumb'] } col-3`}>
+              <img src={ data.cover ? data.cover : '/public/placeholder.jpeg' } alt={ data.name } />
             </div>
-            <div className={`${ styles['book-detail__info'] } p-l-3`}>
+            <div className={`${ styles['book-detail__info'] } col-6 p-l-3`}>
               <h1>{data.name}</h1>
               <div className="p-y-1">
                 <p><b>{ data.author.name }</b></p>

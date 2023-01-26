@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { UserContext } from "contexts/UserProvider";
 import useFetch from "hooks/useFetch";
 import usePopMessage from "hooks/usePopMessage";
 import methods from "utils/methods";
@@ -13,6 +14,12 @@ const Register = () => {
     url: 'http://localhost:4000/users/register',
     method: methods.POST
   });
+
+  // Navigatin
+  const navigate = useNavigate();
+
+  // User setter from user context
+  const { setUser } = useContext(UserContext);
 
   // Pop-up (error/success)
   const [popup, show] = usePopMessage();
@@ -29,6 +36,9 @@ const Register = () => {
     if (data?.token && data?.user) {
       localStorage.setItem('token', data?.token);
       setUser(data?.user);
+
+      // Navigate to homepage
+      navigate('/', { replace: true });
     } else {
       show(error, 'error');
     }

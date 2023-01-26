@@ -60,7 +60,7 @@
     text-align: center;
     line-height: 1;
     padding: 5px 2px;
-    background-color: #3aa159;
+    background-color: #3fc868;
     border-radius: 50%;
     transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
 }
@@ -68,7 +68,7 @@
 .checkbox:checked + .knobs:before {
     content: "";
     left: calc(42px * 0.7);
-    background-color: $secondary;
+    background-color: #e1462a;
 }
 
 .checkbox:checked ~ .layer {

@@ -1,10 +1,11 @@
 import styleModule from './input.module.scss';
 
-const Input = ({ styles, placeholder, type, name, defaultValue, onChangeAction }) => {
+const Input = ({ styles, placeholder, type, accept, name, defaultValue, onChangeAction }) => {
   if (type !== 'textarea') return (
     <input
       name={ name }
       type={ type }
+      accept={ accept }
       placeholder={ placeholder }
       className={ styleModule['input'] }
       style={styles}

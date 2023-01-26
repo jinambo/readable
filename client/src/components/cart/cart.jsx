@@ -69,8 +69,8 @@ const Cart = ({ setCartOpened }) => {
           />
         </div>
 
-        { popup.message && popup.type === 'error' && <p className="pop-error m-b-2 m-t-1">{popup.message}</p> }
-        { popup.message && popup.type === 'success' && <p className="pop-success m-b-2">{popup.message}</p> }
+        { popup.message && popup.type === 'error' && <p className="pop-error m-b-2 m-t-2">{popup.message}</p> }
+        { popup.message && popup.type === 'success' && <p className="pop-success m-b-2 m-t-2">{popup.message}</p> }
 
         <div className={`${ styles['cart__items'] } scrollable m-t-2`}>
           { cart.length <= 0 && <p>The cart is empty right now. 😔</p> }
@@ -89,7 +89,7 @@ const Cart = ({ setCartOpened }) => {
                 </div>
 
                 <div className={`${ styles['item__thumb']}`}>
-                  <img src="https://www.databazeknih.cz/img/books/48_/481910/bmid_babicka-VGR-481910.jpeg" alt="" />
+                  <img src={ book.cover ? book.cover : '/public/placeholder.jpeg' } alt={ book.name } />
                 </div>
 
                 <div className={`${ styles['item__info'] } fg-dark p-l-1`}>
